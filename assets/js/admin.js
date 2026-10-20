@@ -1,6 +1,8 @@
 (function() {
   // MongoDB API Base URL
-  const API_URL = 'http://localhost:5002/api';
+  const API_URL = typeof window !== 'undefined' && window.location.hostname === 'localhost' 
+    ? 'http://localhost:5002/api' 
+    : '/api';
   
   // Fallback to localStorage data
   const STORAGE_KEY = 'oc_studio_data';

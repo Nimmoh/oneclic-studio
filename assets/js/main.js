@@ -120,7 +120,9 @@
 
   // Banner carousel functionality
   function initBannersCarousel() {
-    const API_URL = 'http://localhost:5002/api';
+    const API_URL = typeof window !== 'undefined' && window.location.hostname === 'localhost' 
+      ? 'http://localhost:5002/api' 
+      : '/api';
     const STORAGE_KEY = 'oc_studio_data';
     const DEFAULT_DATA = {
       banners: []
@@ -190,7 +192,9 @@
 
   // Load service images from MongoDB
   function loadServiceImages() {
-    const API_URL = 'http://localhost:5002/api';
+    const API_URL = typeof window !== 'undefined' && window.location.hostname === 'localhost' 
+      ? 'http://localhost:5002/api' 
+      : '/api';
     const STORAGE_KEY = 'oc_studio_data';
     
     async function loadFromAPI() {
@@ -224,7 +228,9 @@
 
   // Load portfolio images from MongoDB
   function loadPortfolioImages() {
-    const API_URL = 'http://localhost:5002/api';
+    const API_URL = typeof window !== 'undefined' && window.location.hostname === 'localhost' 
+      ? 'http://localhost:5002/api' 
+      : '/api';
     const STORAGE_KEY = 'oc_studio_data';
     
     async function loadFromAPI() {
