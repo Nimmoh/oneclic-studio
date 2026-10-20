@@ -400,7 +400,9 @@
     const imageInput = document.getElementById('service-image');
     
     const files = imageInput.files;
-    if (!files || files.length === 0) {
+    const fileCount = files.length; // Store count before any processing
+    
+    if (!files || fileCount === 0) {
       showMessage('Please select at least one image', 'error');
       return;
     }
@@ -422,7 +424,7 @@
         serviceImages.push(event.target.result);
         
         // If this is the last file
-        if (filesProcessed === files.length) {
+        if (filesProcessed === fileCount) {
           // Ensure service exists in data
           if (!data.services[serviceType]) {
             data.services[serviceType] = { title: serviceType, images: [] };
@@ -438,7 +440,7 @@
           delete document.getElementById('services-form').dataset.editKey;
           document.querySelector('#services-form button').textContent = 'Update Service';
           renderServices();
-          showMessage(`Service updated with ${files.length} image(s)!`);
+          showMessage(`Service updated with ${fileCount} image(s)!`);
         }
       };
       reader.readAsDataURL(file);
