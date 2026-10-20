@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One Clic Studio | Admin Dashboard</title>
+<link rel="icon" href="assets/img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500&family=Barlow+Semi+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body>
+<header class="admin-header">
+  <div class="admin-header-content">
+    <h1>Admin Dashboard</h1>
+    <div class="admin-nav">
+      <a href="index.html" class="btn btn-sm btn-ghost">← Back to Site</a>
+      <button id="logout-btn" class="btn btn-sm btn-ghost">Logout</button>
+    </div>
+  </div>
+</header>
+
+<div class="admin-container">
+  <aside class="admin-sidebar">
+    <nav>
+      <button class="nav-btn active" data-tab="banners">Banner Management</button>
+      <button class="nav-btn" data-tab="portfolio">Portfolio Items</button>
+      <button class="nav-btn" data-tab="services">Services</button>
+    </nav>
+  </aside>
+
+  <main class="admin-content">
+    <!-- Banner Management Tab -->
+    <section id="banners-tab" class="admin-tab active">
+      <h2>Hero Section Banners</h2>
+      <div class="admin-section">
+        <div class="form-box">
+          <h3>Add New Banner</h3>
+          <form id="banner-form">
+            <div class="form-group">
+              <label for="banner-title">Banner Title</label>
+              <input id="banner-title" type="text" placeholder="e.g., Professional Photography" required>
+            </div>
+            <div class="form-group">
+              <label for="banner-desc">Description</label>
+              <textarea id="banner-desc" placeholder="Short description" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="banner-image">Upload Image</label>
+              <input id="banner-image" type="file" accept="image/*" multiple required>
+              <small>Supported formats: JPG, PNG, GIF, WebP. You can select multiple images.</small>
+            </div>
+            <button type="submit" class="btn">Add Banner</button>
+          </form>
+        </div>
+
+        <div class="items-list">
+          <h3>Current Banners</h3>
+          <div id="banners-list" class="list-items"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Portfolio Tab -->
+    <section id="portfolio-tab" class="admin-tab">
+      <h2>Portfolio Management</h2>
+      <div class="admin-section">
+        <div class="form-box">
+          <h3>Add Portfolio Item</h3>
+          <form id="portfolio-form">
+            <div class="form-group">
+              <label for="portfolio-title">Project Title</label>
+              <input id="portfolio-title" type="text" placeholder="e.g., Luxury Brand Website" required>
+            </div>
+            <div class="form-group">
+              <label for="portfolio-category">Category</label>
+              <select id="portfolio-category" required>
+                <option value="">Select category</option>
+                <option value="Photography">Photography</option>
+                <option value="Web Design">Web Design</option>
+                <option value="Graphic Design">Graphic Design</option>
+                <option value="Branding">Branding</option>
+                <option value="Digital Marketing">Digital Marketing</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="portfolio-desc">Description</label>
+              <textarea id="portfolio-desc" placeholder="Project description" rows="3" required></textarea>
+            </div>
+            <div class="form-group">
+              <label for="portfolio-image">Upload Image(s)</label>
+              <input id="portfolio-image" type="file" accept="image/*" multiple required>
+              <small>Supported formats: JPG, PNG, GIF, WebP. You can select multiple images for gallery.</small>
+            </div>
+            <button type="submit" class="btn">Add Item</button>
+          </form>
+        </div>
+
+        <div class="items-list">
+          <h3>Portfolio Items</h3>
+          <div id="portfolio-list" class="list-items"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services Tab -->
+    <section id="services-tab" class="admin-tab">
+      <h2>Services Management</h2>
+      <div class="admin-section">
+        <div class="form-box">
+          <h3>Update Service Image</h3>
+          <form id="services-form">
+            <div class="form-group">
+              <label for="service-type">Service Type</label>
+              <select id="service-type" required>
+                <option value="">Select service</option>
+                <option value="photography">Photography</option>
+                <option value="web-design">Web Design</option>
+                <option value="graphic-design">Graphic Design</option>
+                <option value="branding">Branding</option>
+                <option value="digital-marketing">Digital Marketing</option>
+                <option value="social-media">Social Media Marketing</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="service-image">Upload Service Image(s)</label>
+              <input id="service-image" type="file" accept="image/*" multiple required>
+              <small>Recommended size: 500x300px. You can select multiple images.</small>
+            </div>
+            <button type="submit" class="btn">Update Service</button>
+          </form>
+        </div>
+
+        <div class="items-list">
+          <h3>Service Images</h3>
+          <div id="services-list" class="list-items"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="assets/js/admin.js"></script>
+</body>
+</html>
