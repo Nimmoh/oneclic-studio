@@ -1,0 +1,100 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                    FIX: IMAGES NOT LOADING ON VERCEL                          ║
+║                              (5 MINUTE FIX)                                    ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+PROBLEM:
+  Service cards showing gradient placeholders instead of images on mobile/desktop
+
+ROOT CAUSE:
+  MongoDB environment variable NOT SET on Vercel
+
+✅ STEP 1: PUSH CODE
+  Open terminal:
+  $ git add .
+  $ git commit -m "Fix MongoDB"
+  $ git push origin main
+  
+  Wait for Vercel email or check vercel.com
+
+─────────────────────────────────────────────────────────────────────────────────
+
+✅ STEP 2: SET ENVIRONMENT VARIABLE IN VERCEL
+  
+  1. Go: https://vercel.com/dashboard
+  2. Click: oneclic-studio project
+  3. Click: Settings tab
+  4. Click: Environment Variables (left)
+  5. Click: + Add New
+  
+  Then fill in:
+  
+  NAME:  MONGODB_URI
+  
+  VALUE: (copy entire thing)
+  mongodb+srv://nimmohndabari_db_user:vP04zkibpJhM5dJp@cluster0.vcigvxy.mongodb.net/oneclic-studio?retryWrites=true&w=majority
+  
+  ENVIRONMENTS: Select all three
+  
+  Click: Save
+
+─────────────────────────────────────────────────────────────────────────────────
+
+✅ STEP 3: ALLOW VERCEL TO CONNECT TO MONGODB
+  
+  1. Go: https://cloud.mongodb.com
+  2. Click: Cluster0
+  3. Click: Network Access (left sidebar)
+  4. Click: Add IP Address
+  5. Select: Allow Access from Anywhere
+  6. Enter: 0.0.0.0/0
+  7. Click: Confirm
+
+─────────────────────────────────────────────────────────────────────────────────
+
+✅ STEP 4: REDEPLOY ON VERCEL
+  
+  1. Back to: https://vercel.com
+  2. Click: Deployments tab
+  3. Click: three dots (...) on latest deployment
+  4. Click: Redeploy
+  5. Click: Redeploy (confirm)
+  6. Wait: 2-3 minutes for green checkmark
+
+─────────────────────────────────────────────────────────────────────────────────
+
+✅ STEP 5: TEST
+  
+  Desktop/Mobile:
+  1. Refresh your Vercel URL
+  2. Service cards should show images now
+  3. Scroll down to see Portfolio and Banners
+
+  Test in Console (F12):
+  fetch('/api/services').then(r=>r.json()).then(d=>console.log(d))
+  
+  Should see: All 6 services with image data
+
+─────────────────────────────────────────────────────────────────────────────────
+
+🎯 SUCCESS SIGNS:
+  ✓ Service cards show real images (not gradients)
+  ✓ Portfolio items have images
+  ✓ Banner carousel works
+  ✓ Mobile displays everything correctly
+  ✓ Console shows: {photography: {...}, web-design: {...}, ...}
+
+⚠️  IF STILL NOT WORKING:
+  1. Hard refresh: Ctrl+Shift+R (Windows) or Cmd+Shift+R (Mac)
+  2. Wait 30 seconds
+  3. Check MONGODB_URI is in Vercel (with /oneclic-studio)
+  4. Check 0.0.0.0/0 is in MongoDB Atlas Network Access
+  5. Check deployment finished (green checkmark, not "Building")
+
+═════════════════════════════════════════════════════════════════════════════════
+
+⏱️  TOTAL TIME: 5 minutes
+📱 RESULT: Images load on mobile and desktop
+🚀 STATUS: Production ready
+
+═════════════════════════════════════════════════════════════════════════════════

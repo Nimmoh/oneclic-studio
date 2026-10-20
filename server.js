@@ -15,9 +15,24 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.static(path.join(__dirname)));
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/oneclic-studio')
-.then(() => console.log('✓ MongoDB connected'))
-.catch(err => console.log('✗ MongoDB connection error:', err));
+const mongoOptions = {
+  retryWrites: true,
+  w: 'majority',
+  serverSelectionTimeoutMS: 10000,
+  socketTimeoutMS: 45000
+};
+
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/oneclic-studio', mongoOptions)
+  .then(() => {
+    console.log('✓ MongoDB connected successfully');
+    console.log('Database:', process.env.MONGODB_URI?.split('/').pop() || 'oneclic-studio');
+  })
+  .catch(err => {
+    console.log('✗ MongoDB connection error:', err.message);
+    if (err.message.includes('authentication failed')) {
+      console.log('Check your MongoDB credentials in .env');
+    }
+  });
 
 // Schemas
 const bannerSchema = new mongoose.Schema({

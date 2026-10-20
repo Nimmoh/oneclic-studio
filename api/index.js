@@ -19,11 +19,20 @@ async function connectDB() {
   if (mongoConnected) return;
   
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/oneclic-studio');
+    const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/oneclic-studio';
+    console.log('Connecting to MongoDB...');
+    await mongoose.connect(uri, {
+      retryWrites: true,
+      w: 'majority',
+      serverSelectionTimeoutMS: 10000,
+      socketTimeoutMS: 45000
+    });
     mongoConnected = true;
-    console.log('✓ MongoDB connected');
+    console.log('✓ MongoDB connected successfully');
   } catch (err) {
+    mongoConnected = false;
     console.log('✗ MongoDB connection error:', err.message);
+    // Don't throw - let API return gracefully
   }
 }
 
