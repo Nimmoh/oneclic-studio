@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "mkdir -p public && cp index.html admin.html public/ && cp -r assets public/",
+  "buildCommand": "node build.js",
   "outputDirectory": "public",
   "functions": {
     "api/index.js": {
