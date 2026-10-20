@@ -3,7 +3,7 @@
   "buildCommand": "npm install",
   "devCommand": "npm run server-dev",
   "functions": {
-    "server.js": {
+    "api/index.js": {
       "memory": 1024,
       "maxDuration": 30
     }
@@ -11,15 +11,20 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/server.js"
+      "dest": "/api/index.js"
+    },
+    {
+      "src": "/admin.html",
+      "dest": "/admin.html"
+    },
+    {
+      "src": "/index.html",
+      "dest": "/index.html"
     },
     {
       "src": "/(.*)",
-      "dest": "/$1"
+      "dest": "/index.html"
     }
   ],
-  "env": {
-    "MONGODB_URI": "@mongodb_uri",
-    "NODE_ENV": "production"
-  }
+  "public": true
 }
