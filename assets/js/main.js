@@ -135,16 +135,23 @@
     
     async function loadBannersFromAPI() {
       try {
-        const response = await fetch(`${API_URL}/banners`);
+        console.log('📡 Loading banners from API:', API_URL);
+        const response = await fetch(`${API_URL}/banners`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
         if (response.ok) {
           const banners = await response.json();
+          console.log('✓ Banners loaded:', banners.length);
           const data = getData();
           data.banners = banners;
           localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
           return banners;
+        } else {
+          console.warn('⚠️ API response not ok:', response.status);
         }
       } catch (err) {
-        console.log('Could not fetch from MongoDB');
+        console.warn('⚠️ Could not fetch banners from API:', err.message);
       }
       return getData().banners;
     }
@@ -199,26 +206,43 @@
     
     async function loadFromAPI() {
       try {
-        const response = await fetch(`${API_URL}/services`);
+        console.log('📡 Loading services from API:', API_URL);
+        const response = await fetch(`${API_URL}/services`, { 
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        
         if (response.ok) {
           const services = await response.json();
+          console.log('✓ Services loaded:', Object.keys(services).length, services);
           const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
           data.services = services;
           localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
           return services;
+        } else {
+          console.warn('⚠️ API response not ok:', response.status, response.statusText);
         }
       } catch (err) {
-        console.log('Could not fetch services from MongoDB');
+        console.warn('⚠️ Could not fetch services from API:', err.message);
       }
       const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? JSON.parse(stored).services : {};
+      const fallback = stored ? JSON.parse(stored).services : {};
+      console.log('📦 Using fallback services:', Object.keys(fallback).length);
+      return fallback;
     }
     
     loadFromAPI().then(services => {
+      if (!services || Object.keys(services).length === 0) {
+        console.warn('⚠️ No services loaded, using gradient placeholders');
+        return;
+      }
       ['photography', 'web-design', 'graphic-design', 'branding', 'digital-marketing', 'social-media'].forEach(function(service) {
         const img = document.getElementById('service-img-' + service);
         if (img && services[service] && services[service].image) {
           img.style.backgroundImage = 'url(' + services[service].image + ')';
+          console.log('✓ Loaded image for:', service);
+        } else {
+          console.log('⚠️ No image for service:', service);
         }
       });
     });
@@ -235,16 +259,23 @@
     
     async function loadFromAPI() {
       try {
-        const response = await fetch(`${API_URL}/portfolio`);
+        console.log('📡 Loading portfolio from API:', API_URL);
+        const response = await fetch(`${API_URL}/portfolio`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
         if (response.ok) {
           const portfolio = await response.json();
+          console.log('✓ Portfolio loaded:', portfolio.length);
           const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
           data.portfolio = portfolio;
           localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
           return portfolio;
+        } else {
+          console.warn('⚠️ API response not ok:', response.status);
         }
       } catch (err) {
-        console.log('Could not fetch portfolio from MongoDB');
+        console.warn('⚠️ Could not fetch portfolio from API:', err.message);
       }
       const stored = localStorage.getItem(STORAGE_KEY);
       return stored ? JSON.parse(stored).portfolio : [];

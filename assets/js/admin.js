@@ -33,10 +33,11 @@
   // Sync local data with MongoDB on load
   async function syncDataFromMongoDB() {
     try {
+      console.log('🔄 Syncing data from MongoDB...');
       const [bannersRes, portfolioRes, servicesRes] = await Promise.all([
-        fetch(`${API_URL}/banners`),
-        fetch(`${API_URL}/portfolio`),
-        fetch(`${API_URL}/services`)
+        fetch(`${API_URL}/banners`, { method: 'GET', headers: { 'Content-Type': 'application/json' } }),
+        fetch(`${API_URL}/portfolio`, { method: 'GET', headers: { 'Content-Type': 'application/json' } }),
+        fetch(`${API_URL}/services`, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
       ]);
       
       if (bannersRes.ok && portfolioRes.ok && servicesRes.ok) {
@@ -49,10 +50,13 @@
         data.portfolio = portfolio;
         data.services = services;
         saveData(data);
+        console.log('✓ Data synced from MongoDB');
         return true;
+      } else {
+        console.warn('⚠️ One or more API responses failed');
       }
     } catch (err) {
-      console.log('Could not sync from MongoDB, using local data');
+      console.warn('⚠️ Could not sync from MongoDB:', err.message);
     }
     return false;
   }
