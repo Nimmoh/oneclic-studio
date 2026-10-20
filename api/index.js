@@ -2,8 +2,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const path = require('path');
-const fs = require('fs');
 
 dotenv.config();
 
@@ -13,17 +11,6 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
-
-// Serve static files from root
-app.use(express.static(path.join(__dirname, '..')));
-
-// Serve assets
-app.use('/assets', express.static(path.join(__dirname, '../assets')));
-
-// Health check - MUST be first
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Server is running' });
-});
 
 // MongoDB Connection
 let mongoConnected = false;
