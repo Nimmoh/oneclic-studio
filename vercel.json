@@ -2,7 +2,6 @@
   "version": 2,
   "buildCommand": "echo 'Build complete'",
   "devCommand": "npm run server-dev",
-  "public": ".",
   "functions": {
     "api/index.js": {
       "memory": 1024,
