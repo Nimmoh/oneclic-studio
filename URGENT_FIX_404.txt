@@ -1,0 +1,118 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                    🚨 URGENT: 404 ERROR - HOMEPAGE NOT LOADING                ║
+║                                (CRITICAL FIX)                                  ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+PROBLEM:
+  Your Vercel site returns 404 on homepage
+  Cause: Static files not being served
+
+ROOT CAUSE:
+  build.js isn't copying files to the /public directory
+
+✅ IMMEDIATE ACTION REQUIRED:
+
+1. COMMIT AND PUSH CODE NOW:
+   
+   $ git add .
+   $ git commit -m "Fix: 404 error - update vercel.json and ensure build"
+   $ git push origin main
+   
+   (Push and wait 2-3 minutes for Vercel to rebuild)
+
+2. AFTER PUSH, CHECK VERCEL BUILD LOGS:
+   
+   https://vercel.com → oneclic-studio → Deployments
+   → Click latest deployment
+   → Scroll to "Build & Deployments"
+   → Click "View Build Logs"
+   
+   Look for THESE MESSAGES (all should be there):
+   ✓ npm install completed
+   ✓ ✓ Copied index.html
+   ✓ ✓ Copied admin.html
+   ✓ ✓ Copied assets directory
+   ✓ ✅ Build complete - files ready in public/
+
+3. IF BUILD LOGS LOOK GOOD:
+   
+   - Wait 30 seconds more
+   - Refresh your Vercel URL: https://your-project.vercel.app
+   - Should see homepage (not 404)
+
+4. IF STILL 404:
+   
+   - Go to Vercel → Deployments
+   - Click three dots (...) on latest deployment
+   - Click "Redeploy"
+   - Wait 2-3 minutes
+   - Refresh browser again
+
+5. VERIFY IT WORKED:
+   
+   Open browser console (F12) and paste:
+   
+   fetch('/').then(r=>r.text()).then(d=>console.log(d.substring(0,200)))
+   
+   Should show HTML content (not error)
+
+─────────────────────────────────────────────────────────────────────────────────
+
+IF BUILD LOGS SHOW ERROR:
+
+  If you see ✗ (red error) in build logs:
+  
+  1. Go to Vercel Settings
+  2. Click "Build & Development Settings"
+  3. Set:
+     - Build Command: node build.js
+     - Output Directory: public
+  4. Save
+  5. Go to Deployments → Redeploy latest
+
+─────────────────────────────────────────────────────────────────────────────────
+
+WHAT CHANGED:
+
+  ✓ vercel.json - Simplified routing
+  ✓ build.js - Copies files to public/
+  ✓ .gitignore - Doesn't exclude key files
+
+KEY FILES NEEDED:
+  ✓ build.js exists
+  ✓ index.html exists  
+  ✓ admin.html exists
+  ✓ assets/css/ exists
+  ✓ assets/js/ exists
+  ✓ vercel.json correct
+
+─────────────────────────────────────────────────────────────────────────────────
+
+TIMELINE:
+
+  ⏱️  1 minute - Push code: git push origin main
+  ⏱️  2-3 min - Vercel rebuilds and deploys
+  ⏱️  30 sec  - Homepage loads
+  
+  TOTAL: ~5 minutes
+
+─────────────────────────────────────────────────────────────────────────────────
+
+SUCCESS INDICATORS:
+
+  ✅ Vercel build logs show "Build complete"
+  ✅ Homepage loads (not 404)
+  ✅ Can see "Media that matters." heading
+  ✅ Service cards visible
+  ✅ /api/health endpoint works
+  ✅ Mobile displays correctly
+
+═════════════════════════════════════════════════════════════════════════════════
+
+GO DO THIS NOW! 👇
+
+$ git add .
+$ git commit -m "Fix 404"
+$ git push origin main
+
+Then check Vercel in 3 minutes.

@@ -1,6 +1,57 @@
 (function () {
   var C = window.SITE_CONFIG, OC = window.OC, $ = function (s) { return document.querySelector(s); };
 
+  const LOCAL_IMAGE_LIBRARY = {
+    services: {
+      photography: '/public/images/photo1.jpg',
+      'web-design': '/public/images/design.jpeg',
+      'graphic-design': '/public/images/Graphic Design _ Preferred Printing.jpg',
+      branding: '/public/images/Mindset _ Business.jpg',
+      'digital-marketing': '/public/images/ad-img.jpg',
+      'social-media': '/public/images/Ad Inspiration.jpg'
+    },
+    banners: [
+      '/public/images/oneclic.jpeg',
+      '/public/images/Graphics_flyer.jpg',
+      '/public/images/Interface Design.jpg',
+      '/public/images/pro-itee.jpg'
+    ],
+    portfolio: [
+      '/public/images/pro-itee.jpg',
+      '/public/images/photo1.jpg',
+      '/public/images/design.jpeg',
+      '/public/images/ad-img.jpg',
+      '/public/images/Interface Design.jpg',
+      '/public/images/Graphics_flyer.jpg'
+    ]
+  };
+
+  function normalizeImageSource(src, fallback) {
+    if (!src || src === '') return fallback || '';
+    if (src.startsWith('data:image') || src.startsWith('http') || src.startsWith('/') || src.startsWith('./') || src.startsWith('blob:')) return src;
+    if (src.indexOf('assets/') !== -1) return src;
+    return 'assets/img/' + src.replace(/^\/+/, '');
+  }
+
+  function getLocalBannerFallback() {
+    return LOCAL_IMAGE_LIBRARY.banners.map(function (src, index) {
+      return { id: 'local-banner-' + index, title: 'One Clic Studio', desc: '', image: src, order: index };
+    });
+  }
+
+  function getLocalPortfolioFallback() {
+    return LOCAL_IMAGE_LIBRARY.portfolio.map(function (src, index) {
+      return { id: 'local-portfolio-' + index, title: 'One Clic Studio', category: 'Local gallery', desc: 'Local project image', image: src, order: index };
+    });
+  }
+
+  function getLocalServiceFallback() {
+    return Object.keys(LOCAL_IMAGE_LIBRARY.services).reduce(function (acc, key) {
+      acc[key] = { title: key, image: LOCAL_IMAGE_LIBRARY.services[key] };
+      return acc;
+    }, {});
+  }
+
   // Page view, and preselect service from an ad link (?service=web-design)
   OC.track("page_view");
   var wanted = new URLSearchParams(location.search).get("service");
@@ -153,7 +204,14 @@
       } catch (err) {
         console.warn('⚠️ Could not fetch banners from API:', err.message);
       }
-      return getData().banners;
+      const storedData = getData();
+      if (!storedData.banners || storedData.banners.length === 0) {
+        const fallback = getLocalBannerFallback();
+        storedData.banners = fallback;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(storedData));
+        return fallback;
+      }
+      return storedData.banners;
     }
     
     const heroBg = document.getElementById("hero-bg");
@@ -167,7 +225,8 @@
     
     function updateHeroBackground() {
       if (banners[currentIndex] && banners[currentIndex].image) {
-        heroBg.style.backgroundImage = "url('" + banners[currentIndex].image + "')";
+        const image = normalizeImageSource(banners[currentIndex].image, LOCAL_IMAGE_LIBRARY.banners[currentIndex] || LOCAL_IMAGE_LIBRARY.banners[0]);
+        heroBg.style.backgroundImage = "url('" + image + "')";
       }
     }
     
@@ -226,21 +285,25 @@
         console.warn('⚠️ Could not fetch services from API:', err.message);
       }
       const stored = localStorage.getItem(STORAGE_KEY);
-      const fallback = stored ? JSON.parse(stored).services : {};
-      console.log('📦 Using fallback services:', Object.keys(fallback).length);
-      return fallback;
+      const fallback = stored ? JSON.parse(stored).services : getLocalServiceFallback();
+      const mergedFallback = Object.assign({}, getLocalServiceFallback(), fallback || {});
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(Object.assign(JSON.parse(stored || '{}'), { services: mergedFallback })));
+      console.log('📦 Using fallback services:', Object.keys(mergedFallback).length);
+      return mergedFallback;
     }
     
     loadFromAPI().then(services => {
-      if (!services || Object.keys(services).length === 0) {
-        console.warn('⚠️ No services loaded, using gradient placeholders');
-        return;
-      }
-      ['photography', 'web-design', 'graphic-design', 'branding', 'digital-marketing', 'social-media'].forEach(function(service) {
+      const serviceList = ['photography', 'web-design', 'graphic-design', 'branding', 'digital-marketing', 'social-media'];
+      const serviceData = services && Object.keys(services).length ? services : getLocalServiceFallback();
+
+      serviceList.forEach(function(service) {
         const img = document.getElementById('service-img-' + service);
-        if (img && services[service] && services[service].image) {
-          img.style.backgroundImage = 'url(' + services[service].image + ')';
-          console.log('✓ Loaded image for:', service);
+        const entry = serviceData[service] || { image: LOCAL_IMAGE_LIBRARY.services[service] };
+        const image = normalizeImageSource(entry.image, LOCAL_IMAGE_LIBRARY.services[service]);
+
+        if (img) {
+          img.style.backgroundImage = 'url("' + image + '")';
+          console.log('✓ Loaded image for:', service, image);
         } else {
           console.log('⚠️ No image for service:', service);
         }
@@ -278,39 +341,43 @@
         console.warn('⚠️ Could not fetch portfolio from API:', err.message);
       }
       const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? JSON.parse(stored).portfolio : [];
+      const fallback = stored ? JSON.parse(stored).portfolio : getLocalPortfolioFallback();
+      const finalFallback = (fallback && fallback.length) ? fallback : getLocalPortfolioFallback();
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        parsed.portfolio = finalFallback;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+      }
+      return finalFallback;
     }
     
     loadFromAPI().then(portfolio => {
-      if (portfolio && portfolio.length > 0) {
-        const track = document.querySelector('.carousel-track');
-        if (track) {
-          // Clear existing items and rebuild with stored data
-          track.innerHTML = '';
-          portfolio.forEach(function(item) {
-            const div = document.createElement('div');
-            div.className = 'carousel-item';
-            div.innerHTML = 
-              '<div class="carousel-img" style="background-image:url(' + item.image + ')"></div>' +
-              '<h3>' + item.title + '</h3>' +
-              '<p class="portfolio-category">' + item.category + '</p>' +
-              '<p>' + item.desc + '</p>';
-            track.appendChild(div);
-          });
-          
-          // Recreate dots
-          const dotsContainer = document.querySelector('.carousel-dots');
-          if (dotsContainer) {
-            dotsContainer.innerHTML = '';
-            const items = document.querySelectorAll('.carousel-item');
-            items.forEach(function(item, index) {
-              const dot = document.createElement('div');
-              dot.className = 'dot' + (index === 0 ? ' active' : '');
-              dot.onclick = function() { goToSlide(index); };
-              dotsContainer.appendChild(dot);
-            });
-          }
-        }
+      const portfolioItems = portfolio && portfolio.length > 0 ? portfolio : getLocalPortfolioFallback();
+      const track = document.querySelector('.carousel-track');
+      if (track) {
+        track.innerHTML = '';
+        portfolioItems.forEach(function(item, index) {
+          const div = document.createElement('div');
+          div.className = 'carousel-item';
+          const itemImage = normalizeImageSource(item.image, LOCAL_IMAGE_LIBRARY.portfolio[index] || LOCAL_IMAGE_LIBRARY.portfolio[0]);
+          div.innerHTML = 
+            '<div class="carousel-img" style="background-image:url(\'' + itemImage + '\')"></div>' +
+            '<h3>' + (item.title || 'Project') + '</h3>' +
+            '<p class="portfolio-category">' + (item.category || 'Gallery') + '</p>' +
+            '<p>' + (item.desc || 'Portfolio item') + '</p>';
+          track.appendChild(div);
+        });
+      }
+      const dotsContainer = document.querySelector('.carousel-dots');
+      if (dotsContainer) {
+        dotsContainer.innerHTML = '';
+        const items = document.querySelectorAll('.carousel-item');
+        items.forEach(function(item, index) {
+          const dot = document.createElement('div');
+          dot.className = 'dot' + (index === 0 ? ' active' : '');
+          dot.onclick = function() { goToSlide(index); };
+          dotsContainer.appendChild(dot);
+        });
       }
     });
   }

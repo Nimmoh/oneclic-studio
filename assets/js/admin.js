@@ -12,12 +12,12 @@
     banners: [],
     portfolio: [],
     services: {
-      photography: { title: 'Photography', image: '' },
-      'web-design': { title: 'Web Design', image: '' },
-      'graphic-design': { title: 'Graphic Design', image: '' },
-      branding: { title: 'Branding', image: '' },
-      'digital-marketing': { title: 'Digital Marketing', image: '' },
-      'social-media': { title: 'Social Media Marketing', image: '' }
+      photography: { title: 'Photography', image: '/public/images/photo1.jpg' },
+      'web-design': { title: 'Web Design', image: '/public/images/design.jpeg' },
+      'graphic-design': { title: 'Graphic Design', image: '/public/images/Graphic Design _ Preferred Printing.jpg' },
+      branding: { title: 'Branding', image: '/public/images/Mindset _ Business.jpg' },
+      'digital-marketing': { title: 'Digital Marketing', image: '/public/images/ad-img.jpg' },
+      'social-media': { title: 'Social Media Marketing', image: '/public/images/Ad Inspiration.jpg' }
     }
   };
 
