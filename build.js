@@ -48,5 +48,27 @@ try {
   process.exit(1);
 }
 
+// Verify required local images exist in the Vercel public output
+const requiredImages = [
+  'public/images/oneclic.jpeg',
+  'public/images/Graphics_flyer.jpg',
+  'public/images/Interface Design.jpg',
+  'public/images/pro-itee.jpg',
+  'public/images/photo1.jpg',
+  'public/images/design.jpeg',
+  'public/images/Graphic Design _ Preferred Printing.jpg',
+  'public/images/Mindset _ Business.jpg',
+  'public/images/ad-img.jpg',
+  'public/images/Ad Inspiration.jpg',
+  'public/images/logo.png'
+];
+
+const missingImages = requiredImages.filter((file) => !fs.existsSync(file));
+if (missingImages.length) {
+  console.error('✗ Missing local images:', missingImages.join(', '));
+  process.exit(1);
+}
+console.log('✓ Verified local image files');
+
 console.log('✅ Build complete - files ready in public/');
 
