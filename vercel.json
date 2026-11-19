@@ -3,21 +3,14 @@
   "buildCommand": "node build.js",
   "outputDirectory": "public",
   "framework": null,
-  "functions": {
-    "api/index.js": {
-      "runtime": "nodejs18.x",
-      "memory": 1024,
-      "maxDuration": 30
-    }
-  },
   "routes": [
     {
       "src": "/images/(.*)",
       "dest": "/images/$1"
     },
     {
-      "src": "/api/(.*)",
-      "dest": "/api/index.js?path=$1"
+      "src": "^/api/(.*)$",
+      "dest": "/api/index.js"
     }
   ]
 }
