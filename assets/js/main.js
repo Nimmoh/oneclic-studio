@@ -3,26 +3,26 @@
 
   const LOCAL_IMAGE_LIBRARY = {
     services: {
-      photography: '/public/images/photo1.jpg',
-      'web-design': '/public/images/design.jpeg',
-      'graphic-design': '/public/images/Graphic Design _ Preferred Printing.jpg',
-      branding: '/public/images/Mindset _ Business.jpg',
-      'digital-marketing': '/public/images/ad-img.jpg',
-      'social-media': '/public/images/Ad Inspiration.jpg'
+      photography: '/images/photo1.jpg',
+      'web-design': '/images/design.jpeg',
+      'graphic-design': '/images/Graphic%20Design%20_%20Preferred%20Printing.jpg',
+      branding: '/images/Mindset%20_%20Business.jpg',
+      'digital-marketing': '/images/ad-img.jpg',
+      'social-media': '/images/Ad%20Inspiration.jpg'
     },
     banners: [
-      '/public/images/oneclic.jpeg',
-      '/public/images/Graphics_flyer.jpg',
-      '/public/images/Interface Design.jpg',
-      '/public/images/pro-itee.jpg'
+      '/images/oneclic.jpeg',
+      '/images/Graphics_flyer.jpg',
+      '/images/Interface%20Design.jpg',
+      '/images/pro-itee.jpg'
     ],
     portfolio: [
-      '/public/images/pro-itee.jpg',
-      '/public/images/photo1.jpg',
-      '/public/images/design.jpeg',
-      '/public/images/ad-img.jpg',
-      '/public/images/Interface Design.jpg',
-      '/public/images/Graphics_flyer.jpg'
+      '/images/pro-itee.jpg',
+      '/images/photo1.jpg',
+      '/images/Graphic%20Design%20_%20Preferred%20Printing.jpg',
+      '/images/Interface%20Design.jpg',
+      '/images/design.jpeg',
+      '/images/Graphics_flyer.jpg'
     ]
   };
 
@@ -171,215 +171,106 @@
 
   // Banner carousel functionality
   function initBannersCarousel() {
-    const API_URL = typeof window !== 'undefined' && window.location.hostname === 'localhost' 
-      ? 'http://localhost:5002/api' 
-      : '/api';
     const STORAGE_KEY = 'oc_studio_data';
-    const DEFAULT_DATA = {
-      banners: []
-    };
-    
-    function getData() {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? JSON.parse(stored) : DEFAULT_DATA;
-    }
-    
-    async function loadBannersFromAPI() {
-      try {
-        console.log('📡 Loading banners from API:', API_URL);
-        const response = await fetch(`${API_URL}/banners`, {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' }
-        });
-        if (response.ok) {
-          const banners = await response.json();
-          console.log('✓ Banners loaded:', banners.length);
-          const data = getData();
-          data.banners = banners;
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-          return banners;
-        } else {
-          console.warn('⚠️ API response not ok:', response.status);
-        }
-      } catch (err) {
-        console.warn('⚠️ Could not fetch banners from API:', err.message);
-      }
-      const storedData = getData();
-      if (!storedData.banners || storedData.banners.length === 0) {
-        const fallback = getLocalBannerFallback();
-        storedData.banners = fallback;
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(storedData));
-        return fallback;
-      }
-      return storedData.banners;
-    }
-    
+
     const heroBg = document.getElementById("hero-bg");
     const prevBtn = document.querySelector(".hero-prev");
     const nextBtn = document.querySelector(".hero-next");
-    
+
     if (!heroBg) return;
-    
+
     let currentIndex = 0;
-    let banners = [];
-    
+    const banners = getLocalBannerFallback();
+
     function updateHeroBackground() {
-      if (banners[currentIndex] && banners[currentIndex].image) {
-        const image = normalizeImageSource(banners[currentIndex].image, LOCAL_IMAGE_LIBRARY.banners[currentIndex] || LOCAL_IMAGE_LIBRARY.banners[0]);
+      const image = normalizeImageSource(banners[currentIndex].image, LOCAL_IMAGE_LIBRARY.banners[0]);
+      const preloader = new Image();
+      preloader.onload = function () {
         heroBg.style.backgroundImage = "url('" + image + "')";
-      }
+      };
+      preloader.onerror = function () {
+        heroBg.style.backgroundImage = "url('" + LOCAL_IMAGE_LIBRARY.banners[0] + "')";
+      };
+      preloader.src = image;
     }
-    
+
     function nextSlide() {
       currentIndex = (currentIndex + 1) % banners.length;
       updateHeroBackground();
     }
-    
+
     function prevSlide() {
       currentIndex = (currentIndex - 1 + banners.length) % banners.length;
       updateHeroBackground();
     }
-    
-    // Load banners and initialize
-    loadBannersFromAPI().then(data => {
-      banners = data;
-      if (banners.length === 0) {
-        banners = getData().banners;
-      }
-      updateHeroBackground();
-      if (nextBtn) nextBtn.addEventListener('click', nextSlide);
-      if (prevBtn) prevBtn.addEventListener('click', prevSlide);
-      setInterval(nextSlide, 6000);
-    });
+
+    updateHeroBackground();
+    if (nextBtn) nextBtn.addEventListener('click', nextSlide);
+    if (prevBtn) prevBtn.addEventListener('click', prevSlide);
+
+    const hero = document.querySelector('.hero');
+    if (hero) {
+      let touchStartX = 0;
+      hero.addEventListener('touchstart', function (event) {
+        touchStartX = event.changedTouches[0].clientX;
+      }, { passive: true });
+      hero.addEventListener('touchend', function (event) {
+        const distance = event.changedTouches[0].clientX - touchStartX;
+        if (Math.abs(distance) > 50) distance < 0 ? nextSlide() : prevSlide();
+      }, { passive: true });
+    }
+
+    setInterval(nextSlide, 6000);
   }
-  
+
   initBannersCarousel();
 
 
-  // Load service images from MongoDB
+  // Load service images from the deployed public/images folder.
   function loadServiceImages() {
-    const API_URL = typeof window !== 'undefined' && window.location.hostname === 'localhost' 
-      ? 'http://localhost:5002/api' 
-      : '/api';
-    const STORAGE_KEY = 'oc_studio_data';
-    
-    async function loadFromAPI() {
-      try {
-        console.log('📡 Loading services from API:', API_URL);
-        const response = await fetch(`${API_URL}/services`, { 
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' }
-        });
-        
-        if (response.ok) {
-          const services = await response.json();
-          console.log('✓ Services loaded:', Object.keys(services).length, services);
-          const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-          data.services = services;
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-          return services;
-        } else {
-          console.warn('⚠️ API response not ok:', response.status, response.statusText);
-        }
-      } catch (err) {
-        console.warn('⚠️ Could not fetch services from API:', err.message);
+    const serviceList = ['photography', 'web-design', 'graphic-design', 'branding', 'digital-marketing', 'social-media'];
+    const serviceData = getLocalServiceFallback();
+
+    serviceList.forEach(function(service) {
+      const img = document.getElementById('service-img-' + service);
+      if (img) {
+        img.style.backgroundImage = 'url("' + LOCAL_IMAGE_LIBRARY.services[service] + '")';
       }
-      const stored = localStorage.getItem(STORAGE_KEY);
-      const fallback = stored ? JSON.parse(stored).services : getLocalServiceFallback();
-      const mergedFallback = Object.assign({}, getLocalServiceFallback(), fallback || {});
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(Object.assign(JSON.parse(stored || '{}'), { services: mergedFallback })));
-      console.log('📦 Using fallback services:', Object.keys(mergedFallback).length);
-      return mergedFallback;
-    }
-    
-    loadFromAPI().then(services => {
-      const serviceList = ['photography', 'web-design', 'graphic-design', 'branding', 'digital-marketing', 'social-media'];
-      const serviceData = services && Object.keys(services).length ? services : getLocalServiceFallback();
-
-      serviceList.forEach(function(service) {
-        const img = document.getElementById('service-img-' + service);
-        const entry = serviceData[service] || { image: LOCAL_IMAGE_LIBRARY.services[service] };
-        const image = normalizeImageSource(entry.image, LOCAL_IMAGE_LIBRARY.services[service]);
-
-        if (img) {
-          img.style.backgroundImage = 'url("' + image + '")';
-          console.log('✓ Loaded image for:', service, image);
-        } else {
-          console.log('⚠️ No image for service:', service);
-        }
-      });
     });
   }
-  
+
   loadServiceImages();
 
-  // Load portfolio images from MongoDB
+  // Load portfolio images from the deployed public/images folder.
   function loadPortfolioImages() {
-    const API_URL = typeof window !== 'undefined' && window.location.hostname === 'localhost' 
-      ? 'http://localhost:5002/api' 
-      : '/api';
-    const STORAGE_KEY = 'oc_studio_data';
-    
-    async function loadFromAPI() {
-      try {
-        console.log('📡 Loading portfolio from API:', API_URL);
-        const response = await fetch(`${API_URL}/portfolio`, {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' }
-        });
-        if (response.ok) {
-          const portfolio = await response.json();
-          console.log('✓ Portfolio loaded:', portfolio.length);
-          const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-          data.portfolio = portfolio;
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-          return portfolio;
-        } else {
-          console.warn('⚠️ API response not ok:', response.status);
-        }
-      } catch (err) {
-        console.warn('⚠️ Could not fetch portfolio from API:', err.message);
-      }
-      const stored = localStorage.getItem(STORAGE_KEY);
-      const fallback = stored ? JSON.parse(stored).portfolio : getLocalPortfolioFallback();
-      const finalFallback = (fallback && fallback.length) ? fallback : getLocalPortfolioFallback();
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        parsed.portfolio = finalFallback;
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
-      }
-      return finalFallback;
-    }
-    
-    loadFromAPI().then(portfolio => {
-      const portfolioItems = portfolio && portfolio.length > 0 ? portfolio : getLocalPortfolioFallback();
-      const track = document.querySelector('.carousel-track');
-      if (track) {
-        track.innerHTML = '';
-        portfolioItems.forEach(function(item, index) {
-          const div = document.createElement('div');
-          div.className = 'carousel-item';
-          const itemImage = normalizeImageSource(item.image, LOCAL_IMAGE_LIBRARY.portfolio[index] || LOCAL_IMAGE_LIBRARY.portfolio[0]);
-          div.innerHTML = 
-            '<div class="carousel-img" style="background-image:url(\'' + itemImage + '\')"></div>' +
-            '<h3>' + (item.title || 'Project') + '</h3>' +
-            '<p class="portfolio-category">' + (item.category || 'Gallery') + '</p>' +
-            '<p>' + (item.desc || 'Portfolio item') + '</p>';
-          track.appendChild(div);
-        });
-      }
+    const portfolioItems = getLocalPortfolioFallback();
+    const track = document.querySelector('.carousel-track');
+
+    if (track) {
+      track.innerHTML = '';
+      portfolioItems.forEach(function(item, index) {
+        const div = document.createElement('div');
+        div.className = 'carousel-item';
+        const itemImage = normalizeImageSource(item.image, LOCAL_IMAGE_LIBRARY.portfolio[index] || LOCAL_IMAGE_LIBRARY.portfolio[0]);
+        div.innerHTML =
+          '<div class="carousel-img" style="background-image:url(\'' + itemImage + '\')"></div>' +
+          '<h3>' + (item.title || 'Project') + '</h3>' +
+          '<p class="portfolio-category">' + (item.category || 'Gallery') + '</p>' +
+          '<p>' + (item.desc || 'Portfolio item') + '</p>';
+        track.appendChild(div);
+      });
+
       const dotsContainer = document.querySelector('.carousel-dots');
       if (dotsContainer) {
         dotsContainer.innerHTML = '';
-        const items = document.querySelectorAll('.carousel-item');
-        items.forEach(function(item, index) {
+        portfolioItems.forEach(function(_item, index) {
           const dot = document.createElement('div');
           dot.className = 'dot' + (index === 0 ? ' active' : '');
           dot.onclick = function() { goToSlide(index); };
           dotsContainer.appendChild(dot);
         });
       }
-    });
+    }
   }
-  
+
   loadPortfolioImages();

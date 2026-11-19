@@ -13,7 +13,7 @@ if (!fs.existsSync('public')) {
 try {
   fs.copyFileSync('index.html', 'public/index.html');
   console.log('✓ Copied index.html');
-  
+
   fs.copyFileSync('admin.html', 'public/admin.html');
   console.log('✓ Copied admin.html');
 } catch (err) {
@@ -26,12 +26,12 @@ function copyDir(src, dest) {
   if (!fs.existsSync(dest)) {
     fs.mkdirSync(dest, { recursive: true });
   }
-  
+
   const files = fs.readdirSync(src);
-  files.forEach(file => {
+  files.forEach((file) => {
     const srcFile = path.join(src, file);
     const destFile = path.join(dest, file);
-    
+
     if (fs.statSync(srcFile).isDirectory()) {
       copyDir(srcFile, destFile);
     } else {
